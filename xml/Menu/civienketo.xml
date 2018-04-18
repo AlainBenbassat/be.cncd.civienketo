@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/setting/enketo</path>
+    <page_callback>CRM_Civienketo_Form_Setting</page_callback>
+    <title>CiviEnketo</title>
+    <adminGroup>CiviContribute</adminGroup>
+    <desc>Settings for the CiviEnketo module</desc>
+    <access_arguments>administer CiviCRM</access_arguments>
+</item>
+</menu>
