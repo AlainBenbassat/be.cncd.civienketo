@@ -2,14 +2,20 @@
 
 ![Screenshot](/images/screenshot.png)
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+This extension make the link between CiviCRM and an Enketo server.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
 * PHP v5.4+
-* CiviCRM (*FIXME: Version number*)
+* CiviCRM 4.6+
+* KoboToolBox API access
+
+## Features
+
+* Store API parameters in CiviCRM
+* Store importation parameters in CiviCRM
 
 ## Installation (Web UI)
 
