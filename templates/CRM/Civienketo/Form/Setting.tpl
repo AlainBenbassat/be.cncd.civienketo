@@ -38,6 +38,18 @@
     <div class="content">{$form.group_postal.html}</div>
     <div class="clear"></div>
   </div>
+
+<h3>{ts}Mail Settings{/ts}</h3>
+  <div class="crm-section">
+    <div class="label">{$form.template1.label}</div>
+    <div class="content">{$form.template1.html}</div>
+    <div class="clear"></div>
+  </div>
+  <div class="crm-section">
+    <div class="label">{$form.template2.label}</div>
+    <div class="content">{$form.template2.html}</div>
+    <div class="clear"></div>
+  </div>
   <div class="crm-section">
     <div class="label">{$form.send_ack.label}</div>
     <div class="content">{$form.send_ack.html}</div>
@@ -50,15 +62,6 @@
     <div class="content">{$form.verbose.html}</div>
     <div class="clear"></div>
   </div>
-{*
-{foreach from=$elementNames item=elementName}
-  <div class="crm-section">
-    <div class="label">{$form.$elementName.label}</div>
-    <div class="content">{$form.$elementName.html}</div>
-    <div class="clear"></div>
-  </div>
-{/foreach}
-*}
 {* FOOTER *}
 <div class="crm-submit-buttons">
 {include file="CRM/common/formButtons.tpl" location="bottom"}

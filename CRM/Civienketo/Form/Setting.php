@@ -43,20 +43,45 @@ class CRM_Civienketo_Form_Setting extends CRM_Admin_Form_Setting {
     $this->addEntityRef('campaign', ts('Campaign'), array(
           'entity' => 'campaign',
           'placeholder' => ts('- Select a campaign'),
-          'select' => array('minimumInputLength' => 0),
+          'select' => array('minimumInputLength' => 3),
         ),TRUE);
     $campaign = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_campaign'); 
     $this->getElement('campaign')->setValue($campaign); 
 
+    // Mail settings
+
+    $this->addEntityRef('template1', ts('Welcome lettre'), array(
+          'entity' => 'messageTemplate',
+          'placeholder' => ts('- Select a template'),
+          'select' => array('minimumInputLength' => 0),
+          'api' => array(
+              'search_field' => 'msg_title',
+              'label_field' => 'msg_title',
+          ),
+        ),TRUE);
+    $template1 = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_template1'); 
+    $this->getElement('template1')->setValue($template1); 
+
+    $this->addEntityRef('template2', ts('Mandate copy'), array(
+          'entity' => 'messageTemplate',
+          'placeholder' => ts('- Select a template'),
+          'select' => array('minimumInputLength' => 0),
+          'api' => array(
+              'search_field' => 'msg_title',
+              'label_field' => 'msg_title',
+          ),
+        ),TRUE);
+    $template2 = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_template2'); 
+    $this->getElement('template2')->setValue($template2); 
+
+    $this->add('advcheckbox', 'send_ack', ts('Send a confirmation email ?'));
+    $send_ack = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_send_ack'); 
+    $this->getElement('send_ack')->setValue($send_ack); 
 
     // Log level
     $this->add('advcheckbox', 'verbose', ts('Verbose'));
     $verbose = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_verbose'); 
     $this->getElement('verbose')->setValue($verbose); 
-
-    $this->add('advcheckbox', 'send_ack', ts('Send a confirmation email ?'));
-    $send_ack = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_ack'); 
-    $this->getElement('send_ack')->setValue($send_ack); 
 
 /*
     // is production server
@@ -116,6 +141,8 @@ class CRM_Civienketo_Form_Setting extends CRM_Admin_Form_Setting {
     CRM_Core_BAO_Setting::setItem($values['group_email'], 'CiviEnketo Preferences', 'enketo_group_email');
     CRM_Core_BAO_Setting::setItem($values['group_postal'], 'CiviEnketo Preferences', 'enketo_group_postal');
     CRM_Core_BAO_Setting::setItem($values['campaign'], 'CiviEnketo Preferences', 'enketo_campaign');
+    CRM_Core_BAO_Setting::setItem($values['template1'], 'CiviEnketo Preferences', 'enketo_template1');
+    CRM_Core_BAO_Setting::setItem($values['template2'], 'CiviEnketo Preferences', 'enketo_template2');
 
     CRM_Core_Session::setStatus(E::ts('Data updated.'));
     //parent::postProcess();
