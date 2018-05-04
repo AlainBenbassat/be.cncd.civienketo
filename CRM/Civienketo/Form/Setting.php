@@ -50,7 +50,7 @@ class CRM_Civienketo_Form_Setting extends CRM_Admin_Form_Setting {
 
     // Mail settings
 
-    $this->addEntityRef('template1', ts('Welcome lettre'), array(
+    $template1= $this->addEntityRef('template1', ts('Welcome lettre'), array(
           'entity' => 'messageTemplate',
           'placeholder' => ts('- Select a template'),
           'select' => array('minimumInputLength' => 0),
@@ -59,10 +59,10 @@ class CRM_Civienketo_Form_Setting extends CRM_Admin_Form_Setting {
               'label_field' => 'msg_title',
           ),
         ),TRUE);
-    $template1 = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_template1'); 
-    $this->getElement('template1')->setValue($template1); 
+    $template1->setValue(CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_template1')); 
+    $template1->freeze();
 
-    $this->addEntityRef('template2', ts('Mandate copy'), array(
+    $template2 = $this->addEntityRef('template2', ts('Mandate copy'), array(
           'entity' => 'messageTemplate',
           'placeholder' => ts('- Select a template'),
           'select' => array('minimumInputLength' => 0),
@@ -70,13 +70,13 @@ class CRM_Civienketo_Form_Setting extends CRM_Admin_Form_Setting {
               'search_field' => 'msg_title',
               'label_field' => 'msg_title',
           ),
-        ),TRUE);
-    $template2 = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_template2'); 
-    $this->getElement('template2')->setValue($template2); 
+        ),FALSE);
+    $template2->setValue(CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_template2')); 
+    $template2->freeze();
 
-    $this->add('advcheckbox', 'send_ack', ts('Send a confirmation email ?'));
-    $send_ack = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_send_ack'); 
-    $this->getElement('send_ack')->setValue($send_ack); 
+    $send_ack = $this->add('advcheckbox', 'send_ack', ts('Send a confirmation email ?'));
+    $send_ack->setValue(CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_send_ack')); 
+    $send_ack->freeze();
 
     // Log level
     $this->add('advcheckbox', 'verbose', ts('Verbose'));
