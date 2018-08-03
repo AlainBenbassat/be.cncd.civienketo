@@ -32,7 +32,7 @@
     <td>{if $form.extra.downloadable}{ts}Enabled{/ts}{/if}</td>
     <td>{$form.extra.num_of_submissions}</td>
     <td>{$form.extra.last_submission_time|date_format:"%d/%m/%y - %H:%M"}</td>
-    <td>{$form.extra.last_import_time|date_format:"%d/%m/%y - %H:%M"}</td>
+    <td>{$form.extra.last_importation_time|date_format:"%d/%m/%y - %H:%M"}</td>
     <td><a href="{$form.id}">{ts}Details{/ts}</a> 
         <a href="{$form.extra.url}">{ts}View{/ts}</a> 
         <a href="{$form.extra.enketo_url}">{ts}Form{/ts}</a>
