@@ -7,5 +7,11 @@
     <adminGroup>CiviContribute</adminGroup>
     <desc>Settings for the CiviEnketo module</desc>
     <access_arguments>administer CiviCRM</access_arguments>
-</item>
+  </item>
+  <item>
+    <path>civicrm/enketo/forms</path>
+    <page_callback>CRM_Civienketo_Page_EnketoForms</page_callback>
+    <title>EnketoForms</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
