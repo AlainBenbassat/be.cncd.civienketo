@@ -1,8 +1,3 @@
-<h3>Enketo forms</h3>
-
-<p>
-{ts}Last server sync:{/ts} {$last_sync_timestamp}
-</p>
 <table id="contact-activity-selector-dashlet">
 <thead>
   <tr>
