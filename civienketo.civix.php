@@ -269,10 +269,10 @@ function _civienketo_civix_civicrm_managed(&$entities) {
       if (empty($e['module'])) {
         $e['module'] = E::LONG_NAME;
       }
-      $entities[] = $e;
       if (empty($e['params']['version'])) {
         $e['params']['version'] = '3';
       }
+      $entities[] = $e;
     }
   }
 }
@@ -456,5 +456,11 @@ function _civienketo_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL
 
 function _civienketo_civix_civicrm_entityTypes(&$entityTypes) {
   $entityTypes = array_merge($entityTypes, array (
+    'CRM_Civienketo_DAO_EnketoForm' => 
+    array (
+      'name' => 'EnketoForm',
+      'class' => 'CRM_Civienketo_DAO_EnketoForm',
+      'table' => 'civicrm_enketo_form',
+    ),
   ));
 }
