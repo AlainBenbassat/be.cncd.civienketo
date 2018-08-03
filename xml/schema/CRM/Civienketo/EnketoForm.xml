@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Civienketo</base>
+  <class>EnketoForm</class>
+  <name>civicrm_enketo_form</name>
+  <comment>Enketo forms</comment>
+  <add>4.6</add>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique EnketoForm ID</comment>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>form_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <title>Form ID</title>
+    <comment>ID of the remote form</comment>
+  </field>
+
+  <field>
+    <name>title</name>
+    <type>varchar</type>
+    <length>64</length>
+    <title>Title</title>
+    <comment>Name of the form.</comment>
+  </field>
+
+  <field>
+    <name>url</name>
+    <type>varchar</type>
+    <length>256</length>
+    <title>URL</title>
+    <comment>API URL</comment>
+  </field>
+
+  <field>
+    <name>data_url</name>
+    <type>varchar</type>
+    <length>256</length>
+    <title>Data URL</title>
+    <comment>URL for downloading data.</comment>
+  </field>
+
+  <field>
+    <name>enketo_url</name>
+    <type>varchar</type>
+    <length>256</length>
+    <title>Enkto form URL</title>
+    <comment>URL of enketo web form</comment>
+  </field>
+
+  <field>
+    <name>num_of_submissions</name>
+    <type>int unsigned</type>
+    <title>Number of submissions</title>
+    <comment>Number of records</comment>
+  </field>
+
+  <field>
+    <name>last_submission_time</name>
+    <type>varchar</type>
+    <length>256</length>
+    <title>Last submission timestamp</title>
+    <comment>Date of the last record submission</comment>
+  </field>
+
+  <field>
+    <name>downloadable</name>
+    <type>boolean</type>
+    <title>Downloadable</title>
+    <default>0</default>
+    <comment>If true - the form is active.</comment>
+  </field>
+
+</table>
