@@ -16,6 +16,9 @@
     <th colspan="1" rowspan="1" class="ccrm-banking-payment_state ui-state-default">
 	<div class="DataTables_sort_wrapper">{ts}Last submission{/ts}</div>
     </th>
+    <th colspan="1" rowspan="1" class="ccrm-banking-payment_state ui-state-default">
+	<div class="DataTables_sort_wrapper">{ts}Last import{/ts}</div>
+    </th>
     <th colspan="1" rowspan="1" class="hiddenElement ui-state-default">
 	<div class="DataTables_sort_wrapper">&nbsp;</div>
     </th>
@@ -28,7 +31,8 @@
     <td>{$form.label}</td>
     <td>{if $form.extra.downloadable}{ts}Enabled{/ts}{/if}</td>
     <td>{$form.extra.num_of_submissions}</td>
-    <td>{$form.extra.last_submission_time|date_format:"%d %B %y %H:%M"}</td>
+    <td>{$form.extra.last_submission_time|date_format:"%d/%m/%y - %H:%M"}</td>
+    <td>{$form.extra.last_import_time|date_format:"%d/%m/%y - %H:%M"}</td>
     <td><a href="{$form.id}">{ts}Details{/ts}</a> 
         <a href="{$form.extra.url}">{ts}View{/ts}</a> 
         <a href="{$form.extra.enketo_url}">{ts}Form{/ts}</a>

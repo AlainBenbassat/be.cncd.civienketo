@@ -87,8 +87,9 @@ CREATE TABLE `civicrm_enketo_form` (
      `url` varchar(256)    COMMENT 'URL de l\'API',
      `data_url` varchar(256)    COMMENT 'URL for downloading data.',
      `enketo_url` varchar(256)    COMMENT 'URL of enketo web form',
-     `num_of_submissions` int unsigned    COMMENT 'Number of records',
-     `last_submission_time` varchar(256)    COMMENT 'Date of the last record submission',
+     `num_of_submissions` int unsigned   DEFAULT 0 COMMENT 'Number of records',
+     `last_submission_time` varchar(64)    COMMENT 'Date of the last record submission',
+     `last_importation_time` varchar(64)    COMMENT 'Date of the last imporation',
      `downloadable` tinyint   DEFAULT 0 COMMENT 'If true - the form is active.' 
 ,
         PRIMARY KEY (`id`)

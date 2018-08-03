@@ -63,15 +63,24 @@
     <name>num_of_submissions</name>
     <type>int unsigned</type>
     <title>Number of submissions</title>
+    <default>0</default>
     <comment>Number of records</comment>
   </field>
 
   <field>
     <name>last_submission_time</name>
     <type>varchar</type>
-    <length>256</length>
+    <length>64</length>
     <title>Last submission timestamp</title>
     <comment>Date of the last record submission</comment>
+  </field>
+
+  <field>
+    <name>last_importation_time</name>
+    <type>varchar</type>
+    <length>64</length>
+    <title>Last importation timestamp</title>
+    <comment>Date of the last imporation</comment>
   </field>
 
   <field>
