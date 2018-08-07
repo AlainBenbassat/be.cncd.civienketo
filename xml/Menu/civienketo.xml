@@ -14,4 +14,10 @@
     <title>EnketoForms</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/enketo/import</path>
+    <page_callback>CRM_Civienketo_Page_EnketoImport</page_callback>
+    <title>EnketoImport</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

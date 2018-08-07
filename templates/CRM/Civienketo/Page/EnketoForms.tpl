@@ -44,7 +44,7 @@
 </table>
 
 <div>
-  <a class="button" href="{$url_refresh}">
+  <a class="button" href="../import">
     <div class="icon inform-icon"></div>{ts}Refresh{/ts}
   </a>
 </div>
