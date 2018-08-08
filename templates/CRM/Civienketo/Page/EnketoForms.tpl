@@ -36,7 +36,7 @@
     <td><a href="{$form.id}">{ts}Details{/ts}</a> 
         <a href="{$form.extra.url}">{ts}View{/ts}</a> 
         <a href="{$form.extra.enketo_url}">{ts}Form{/ts}</a>
-        <a href="{$form.extra.data_url}">{ts}Download{/ts}</a>
+        <a href="../import/{$form.id}">{ts}Import{/ts}</a>
     </td>
   </tr>
   {/foreach}
@@ -44,7 +44,7 @@
 </table>
 
 <div>
-  <a class="button" href="../import">
+  <a class="button" href="../import/">
     <div class="icon inform-icon"></div>{ts}Refresh{/ts}
   </a>
 </div>

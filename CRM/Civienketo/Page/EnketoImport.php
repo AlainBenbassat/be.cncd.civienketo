@@ -42,15 +42,23 @@ bose');
       parent::run();
       return;
     }
+    if (!isset($_REQUEST['form_id'])) {
+      CRM_Core_Session::setStatus(ts('You must specify a form.'), ts('Import Error'), 'error');
+      parent::run();
+      return;
+    } else {
+      //$form= 168268;
+      $form = $_REQUEST['form_id'];
+    }
+    
 
     // --- Download file ---
     $today = date_create(date('Y-m-d'));
     $yesterday = date_sub($today, date_interval_create_from_date_string("1 days"))->format("Y-m-d");
     $uploadDir = CRM_Core_Config::singleton()->uploadDir;
-    $filename= $uploadDir."import-KTB-$yesterday.json";
+    $filename= $uploadDir.'enketo_data-'.$form.'-'.$yesterday.'.json';
 
     $api= "api/v1/data/";
-    $form= 168268;
     $query= '?query={"_submission_time":{"$gt":"'.$yesterday.'"}}';
 
     $opts = array(
@@ -62,24 +70,24 @@ bose');
     );
     $context = stream_context_create($opts);
 
-    if ($verbose) $logs[] = ts('Downloading').' '.$server_url.$api.$form.$query;
+    if ($verbose) $logs[] = ts('Downloading form').' '.$form.' ...';
  
     $data = file_get_contents($server_url.$api.$form.$query, false, $context);
     $size = file_put_contents($filename, $data);
     if ($size == 0) { 
-      CRM_Core_Session::setStatus(ts('Downladed file is empty.'), ts('Import waring'), 'warning');
+      CRM_Core_Session::setStatus(ts('Downladed file is empty.'), ts('Import waring'), 'warn');
     }
   
     if ($verbose) {
-      $logs[] = ts("- File downloaded: ").$filename;
-      $logs[] = ts("- Downloaded size: ").$size." b";
+      $logs[] = '- '.ts('Server url: ').$server_url.$api.$form.$query;
+      $logs[] = '- '.ts('File downloaded: ').$filename;
+      $logs[] = '- '.ts('Downloaded size: ').$size." b";
     }
 
 
     // --- Import file ---
     $mandates = json_decode($data, true);
     $contact_name = [];
-
 
     foreach ($mandates as $mandate) {
       $nb_line++;
@@ -91,17 +99,18 @@ bose');
       $contacts[]= $contact;    
 
       if ($verbose) { 
-        $logs[] = $nb_line." - ".$contact." - ";
+        $log_entry = $nb_line." - ".$contact." - ";
         if ($mandate["mandate/amount"]!="other") {
-          $logs[] = $iban." : ".$mandate['mandate/amount']." €";
+          $log_entry.= $iban." : ".$mandate['mandate/amount']." €";
         } else {    
-          $logs[] = $iban." : ".$mandate['mandate/amount_other']." €";
+          $log_entry.= $iban." : ".$mandate['mandate/amount_other']." €";
         }
+        $logs[] = $log_entry;
       }
     }
 
     if ($verbose) {
-      $logs[] = ts("done").'.';
+      $logs[] = '... '.ts("completed").'.';
     }
 
     $this->assign('logs', $logs);
