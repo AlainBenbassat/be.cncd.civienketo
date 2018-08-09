@@ -11,11 +11,13 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 * PHP v5.4+
 * CiviCRM 4.6+
 * KoboToolBox API access
+* libphp-phpmailer
 
 ## Features
 
 * Store API parameters in CiviCRM
 * Store importation parameters in CiviCRM
+* Import data via KoboToolBox API
 
 ## Installation (Web UI)
 
@@ -38,7 +40,7 @@ install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
 git clone https://github.com/FIXME/be.cncd.civienketo.git
-cv en civienketo
+cd be.cncd.civienketo
 ```
 
 ## Usage

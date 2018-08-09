@@ -4,8 +4,7 @@ use CRM_Civienketo_ExtensionUtil as E;
 class CRM_Civienketo_Page_EnketoImport extends CRM_Core_Page {
 
   public function run() {
-    // Example: Set the page-title dynamically; alternatively, declare a static title in xml/Menu/*.xml
-    CRM_Utils_System::setTitle(E::ts('Import records'));
+    CRM_Utils_System::setTitle(E::ts('Import form records'));
     $this->assign('currentTime', date('Y-m-d H:i:s'));
 
     // --- Parameters ---
@@ -47,8 +46,8 @@ bose');
       parent::run();
       return;
     } else {
-      //$form= 168268;
       $form = $_REQUEST['form_id'];
+      // TODO Test if this form exist in CiviEnketo
     }
     
 
@@ -70,7 +69,7 @@ bose');
     );
     $context = stream_context_create($opts);
 
-    if ($verbose) $logs[] = ts('Downloading form').' '.$form.' ...';
+    $logs_download[] = ts('- Downloading form n.').' '.$form.'... ';
  
     $data = file_get_contents($server_url.$api.$form.$query, false, $context);
     $size = file_put_contents($filename, $data);
@@ -79,43 +78,41 @@ bose');
     }
   
     if ($verbose) {
-      $logs[] = '- '.ts('Server url: ').$server_url.$api.$form.$query;
-      $logs[] = '- '.ts('File downloaded: ').$filename;
-      $logs[] = '- '.ts('Downloaded size: ').$size." b";
+      $logs_download[] = '- '.ts('Server url: ').$server_url.$api.$form.$query;
+      $logs_download[] = '- '.ts('File downloaded: ').$filename;
+      $logs_download[] = '- '.ts('File size: ').$size." b";
     }
 
+    // Import file 
+    $records = json_decode($data, true);
+    $importer = new CRM_Civienketo_Importer_CNCD($records);
+    $importer->run();
+    $logs_import = $importer->getLog();
 
-    // --- Import file ---
-    $mandates = json_decode($data, true);
-    $contact_name = [];
 
-    foreach ($mandates as $mandate) {
-      $nb_line++;
+    // Notify manager by email
+    $logs_summary = $importer->getSummary();
+    send_mail2contact($manager, "[CiviEnketo] Résultat d'importation",
+      "<h1>Rapport d'importation des mandats</h1>".
+      "<h2>".ts('Summary')."</h2>".
+      $logs_summary);
+      
+    // Log timestamp in CiviCRM DB
+    $result = civicrm_api3('EnketoForm', 'get', [
+        'sequential' => 1,
+        'form_id' => $form,
+      ]);
+    $form_id= $result['id'];
   
-      $mandate["contact/lastname"]= ucfirst($mandate["contact/lastname"]);
-      $mandate["contact/firstname"]= ucfirst($mandate["contact/firstname"]);
-      $iban= $mandate['mandate0/iban_country'].$mandate['mandate_num/iban_checksum'].$mandate['mandate_num/iban_account'];
-      $contact= $mandate["contact/lastname"].", ".$mandate["contact/firstname"];
-      $contacts[]= $contact;    
+    $result = civicrm_api3('EnketoForm', 'create', [
+        'last_importation_time' => date("Y-m-d H:i:s"),
+        'id' => $form_id,
+    ]);
 
-      if ($verbose) { 
-        $log_entry = $nb_line." - ".$contact." - ";
-        if ($mandate["mandate/amount"]!="other") {
-          $log_entry.= $iban." : ".$mandate['mandate/amount']." €";
-        } else {    
-          $log_entry.= $iban." : ".$mandate['mandate/amount_other']." €";
-        }
-        $logs[] = $log_entry;
-      }
-    }
-
-    if ($verbose) {
-      $logs[] = '... '.ts("completed").'.';
-    }
-
-    $this->assign('logs', $logs);
+    $this->assign('logs_download', $logs_download);
+    $this->assign('logs_import', $logs_import);
+    $this->assign('logs_summary', $logs_summary);
 
     parent::run();
   }
-
 }

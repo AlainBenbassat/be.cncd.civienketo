@@ -36,7 +36,7 @@
     <td><a href="{$form.id}">{ts}Details{/ts}</a> 
         <a href="{$form.extra.url}">{ts}View{/ts}</a> 
         <a href="{$form.extra.enketo_url}">{ts}Form{/ts}</a>
-        <a href="../import/{$form.id}">{ts}Import{/ts}</a>
+        <a href="../import?form_id={$form.extra.form_id}">{ts}Import{/ts}</a>
     </td>
   </tr>
   {/foreach}
