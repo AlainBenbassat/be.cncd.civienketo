@@ -1,7 +1,5 @@
 <h3>{ts}Logs{/ts}</h3>
 
-<p>Script started at {$currentTime}</p>
-
 <h4>{ts}Download{/ts}</h4>
 <p>
 {foreach from=$logs_download item=log}
