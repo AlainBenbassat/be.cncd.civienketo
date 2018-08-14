@@ -17,6 +17,7 @@ class CRM_Civienketo_Importer_CNCD {
   protected $nb_new_contact;
   protected $nb_new_mandate;
   protected $nb_duplicate_IBAN;
+  protected $count_notes;
   protected $timestamp_start;
   protected $timestamp_end;
   protected $logs;
@@ -28,9 +29,10 @@ class CRM_Civienketo_Importer_CNCD {
   function __construct($records) {
     $this->nb_lines = 0;
     $this->nb_errors = 0;
-    $this->nb_new_contact= 0;
-    $this->nb_new_mandate= 0;
-    $this->nb_duplicate_IBAN= 0;
+    $this->nb_new_contact = 0;
+    $this->nb_new_mandate = 0;
+    $this->nb_duplicate_IBAN = 0;
+    $this->count_notes = 0;
     $this->logs = array();
 
     $this->mandates = $records;
@@ -101,6 +103,7 @@ class CRM_Civienketo_Importer_CNCD {
       }
       if (isset($mandate['info/remarks']) && $mandate['info/remarks'] != "") {
           create_donor_note($contact_id, "Note d'un ambassadeur" , $mandate['username'].'> '.$mandate['info/remarks']);
+          $this->count_notes++;
           send_mail2contact($this->manager, "Note d'un ambassadeur", 
             "<p>".$mandate['username']." a écrit la note suivante : '".$mandate['info/remarks']."' dans la fiche de ce <a href='https://crm.cncd.be/civicrm/contact/view?reset=1&cid=".$contact_id."'>contact</a>.</p>".
              "<p>Merci de prendre les dispositions adéquates.<br>Civibot</p>");
@@ -181,6 +184,7 @@ class CRM_Civienketo_Importer_CNCD {
     $summary.= "<p>".ts("Start Date")." : ".$this->timestamp_start."</p>";
     $summary.= "$this->nb_lines fiches reçues : <br>";
     $summary.= "- $this->nb_new_contact contacts crées.<br>";
+    $summary.= "- $this->count_notes notes créées.<br>";
     $summary.= "- $this->nb_new_mandate mandats créés. <br>";
     $summary.= "- $this->nb_duplicate_IBAN IBAN en double. <br>";
     $summary.= "Nombre d'erreurs rencontrées et annulées : $this->nb_errors.<br>";

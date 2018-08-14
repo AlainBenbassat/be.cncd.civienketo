@@ -19,6 +19,11 @@
     <div class="clear"></div>
   </div>
   <div class="crm-section">
+    <div class="label">{$form.managers.label}</div>
+    <div class="content">{$form.managers.html}</div>
+    <div class="clear"></div>
+  </div>
+  <div class="crm-section">
     <div class="label">{$form.campaign.label}</div>
     <div class="content">{$form.campaign.html}</div>
     <div class="clear"></div>

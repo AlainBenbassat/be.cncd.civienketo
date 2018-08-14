@@ -11,8 +11,8 @@ class CRM_Civienketo_Page_EnketoImport extends CRM_Core_Page {
 bose');
     if (!isset($verbose)) $verbose = true;
 
-    $manager = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_manager');
-    if (!isset($manager) || $manager==0 ) $manager = 1;
+    $managers_group = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_managers');
+    if (!isset($managers_group) || $managers_group==0) $managers_group = 1;
     
     $campaign = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_campaign');
 
@@ -46,13 +46,14 @@ bose');
 
     // Notify manager by email
     $logs_summary = $importer->getSummary();
-    send_mail2contact($manager, "[CiviEnketo] Résultat d'importation",
+    send_mail2group($managers_group, "admcrm@cncd.be", 
+                    "[CiviEnketo] Résultat d'importation",
       "<h1>Rapport d'importation des mandats</h1>".
       "<h2>".ts('Details')."</h2>".
       implode($logs_import, '<br>').
       "<h2>".ts('Summary')."</h2>".
       $logs_summary);
-      
+
     // Log timestamp in CiviCRM DB
     $result = civicrm_api3('EnketoForm', 'get', [
         'sequential' => 1,

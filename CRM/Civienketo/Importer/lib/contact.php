@@ -305,14 +305,20 @@ function add_home_phone($uid, $phone, $phone_type="Phone") {
 /**
   Send a email to a contact
 */
-function send_mail2contact($contact_id, $subject, $message, $file=null) {
+function send_mail2contact($contact_id, $subject, $message, $file=null, $sender='donateurs@cncd.be') {
   require_once('libphp-phpmailer/class.phpmailer.php');
 
+  $email = new PHPMailer();
+  $email->setFrom($sender, 'CNCD-11.11.11');
+  $email->Subject = $subject;
+  $email->CharSet = 'UTF-8';
+  $email->msgHTML($message);
+
+  // Recipients
   $result = civicrm_api3('Contact', 'get', array(
     'sequential' => 1,
     'id' => $contact_id, 
   ));
-
   if ((!isset($result['count']) || $result['count'] != 1)) {
      return -1;
   }
@@ -320,16 +326,7 @@ function send_mail2contact($contact_id, $subject, $message, $file=null) {
   if ((!isset($contact['email']) || $contact['email'] == '')) {
     return -2;
   }
-  
-  $recipient=$contact['email'];
-
-  $email = new PHPMailer();
-  $email->setFrom('donateurs@cncd.be', 'CNCD-11.11.11');
-//  $email->addReplyTo('donateurs@cncd.be', 'CNCD-11.11.11');
-  $email->Subject = $subject;
-  $email->CharSet = 'UTF-8';
-  $email->msgHTML($message);
-  $email->addAddress($recipient);
+  $email->addAddress($contact['email']);
 
   if ($file) $email->addAttachment($file);
   
@@ -348,5 +345,41 @@ function create_donor_note($uid, $subject, $text) {
 
 
   return $result['id'];
+}
+
+/***
+ * Send mail to contacts of a group
+ */
+function send_mail2group($group_id, $from, $subject, $message) {
+  $result = civicrm_api3('GroupContact', 'get', array(
+      'sequential' => 1,
+      'group_id' => $group_id,
+  ));
+  if (!isset($result['count']) || $result['count'] == 0) {
+    return 0;
+  }
+  $count = 0;
+  foreach($result['values'] as $contact) {
+    $count++;
+    $contact_id = $contact['contact_id'];
+    $result = civicrm_api3('Contact', 'get', array(
+      'sequential' => 1,
+      'id' => $contact_id, 
+    ));
+
+    $recipient = $result['values'][0]['email'];
+    $mailParams = array(
+        'from' => $from,
+        'toName' => 'Enketo Manager',
+        'toEmail' => $recipient,
+        'subject' =>  $subject,
+        'html' => $message,
+    );
+
+  //echo ("Email $recipient<br>");
+  $result_send = CRM_Utils_Mail::send($mailParams);
+  }
+
+  return $count;
 }
 ?>

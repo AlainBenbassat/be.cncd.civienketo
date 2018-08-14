@@ -39,6 +39,14 @@ class CRM_Civienketo_Form_Setting extends CRM_Admin_Form_Setting {
     $manager = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_manager'); 
     $this->getElement('manager')->setValue($manager); 
 
+    $this->addEntityRef('managers', ts('Managers'), array(
+          'entity' => 'group',
+          'placeholder' => ts('- Select a group'),
+          'select' => array('minimumInputLength' => 0),
+        ),TRUE);
+    $managers = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_managers'); 
+    $this->getElement('managers')->setValue($managers); 
+
     // Campaign
     $this->addEntityRef('campaign', ts('Campaign'), array(
           'entity' => 'campaign',
@@ -135,6 +143,7 @@ class CRM_Civienketo_Form_Setting extends CRM_Admin_Form_Setting {
     CRM_Core_BAO_Setting::setItem($values['server_url'], 'CiviEnketo Preferences', 'enketo_server_url');
     CRM_Core_BAO_Setting::setItem($values['server_token'], 'CiviEnketo Preferences', 'enketo_server_token');
     CRM_Core_BAO_Setting::setItem($values['manager'], 'CiviEnketo Preferences', 'enketo_manager');
+    CRM_Core_BAO_Setting::setItem($values['managers'], 'CiviEnketo Preferences', 'enketo_managers');
     CRM_Core_BAO_Setting::setItem($values['verbose'], 'CiviEnketo Preferences', 'enketo_verbose');
     CRM_Core_BAO_Setting::setItem($values['send_ack'], 'CiviEnketo Preferences', 'enketo_send_ack');
     CRM_Core_BAO_Setting::setItem($values['group_parent'], 'CiviEnketo Preferences', 'enketo_group_parent');

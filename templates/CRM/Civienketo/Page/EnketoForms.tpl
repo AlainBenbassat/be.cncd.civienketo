@@ -44,7 +44,7 @@
 </table>
 
 <div>
-  <a class="button" href="../import/">
+  <a class="button" href="">
     <div class="icon inform-icon"></div>{ts}Refresh{/ts}
   </a>
 </div>
