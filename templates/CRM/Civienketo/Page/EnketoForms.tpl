@@ -36,7 +36,9 @@
     <td><a href="{$form.id}">{ts}Details{/ts}</a> 
         <a href="{$form.extra.url}">{ts}View{/ts}</a> 
         <a href="{$form.extra.enketo_url}">{ts}Form{/ts}</a>
+        {if $form.extra.num_of_submissions > 0}
         <a href="../import?form_id={$form.extra.form_id}">{ts}Import{/ts}</a>
+        {/if}
     </td>
   </tr>
   {/foreach}
@@ -47,6 +49,7 @@
   <a class="button crm-extensions-refresh" id="new" onClick="update(this);">
     <div class="icon inform-icon"></div>{ts}Refresh{/ts}
   </a>
+  <img name='busy' src="{$config->resourceBase}i/loading.gif" hidden="1"/>
 </div>
 
 {literal}
@@ -54,6 +57,7 @@
   // UPDATE BUTTONS
   function update(button) {
     cj('.button').addClass('disabled');
+    cj(button).parent().find('[name="busy"]').show();
 
     var call = CRM.api3('EnketoForm', 'sync', {
       "magicword": "sesame"
@@ -61,6 +65,8 @@
 
     call.done(function(result) {
       cj('.button').removeClass('disabled');
+      cj(button).parent().find('[name="busy"]').hide();
+
       location.reload(); 
     });
 
@@ -68,6 +74,7 @@
       function(result) {
         CRM.alert("{/literal}{ts}The update timed out, but maybe it was partially succesful. You might want to try again.{/ts}", "{ts}Update Problem{/ts}{literal}", "error");
         cj('.button').removeClass('disabled');
+        cj(button).parent().find('[name="busy"]').hide();
       });
   }
 </script>
