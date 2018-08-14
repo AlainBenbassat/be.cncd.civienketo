@@ -20,7 +20,7 @@
 </p>
 
 <div>
-  <a class="button" href="../forms/">
+  <a class="button" href="{crmURL p='civicrm/enketo/forms/'}">
     <div class="icon inform-icon"></div>{ts}Done{/ts}
   </a>
 </div>

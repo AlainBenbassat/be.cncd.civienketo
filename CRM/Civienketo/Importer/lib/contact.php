@@ -349,15 +349,16 @@ function create_donor_note($uid, $subject, $text) {
 
 /***
  * Send mail to contacts of a group
+ * (Limited to 3 contacts)
  */
 function send_mail2group($group_id, $from, $subject, $message) {
   $result = civicrm_api3('GroupContact', 'get', array(
       'sequential' => 1,
       'group_id' => $group_id,
   ));
-  if (!isset($result['count']) || $result['count'] == 0) {
-    return 0;
-  }
+  if (!isset($result['count']) || $result['count'] == 0) return 0;
+  if ($result['count'] > 3) return -1; // Anti massive leak precaution
+
   $count = 0;
   foreach($result['values'] as $contact) {
     $count++;
