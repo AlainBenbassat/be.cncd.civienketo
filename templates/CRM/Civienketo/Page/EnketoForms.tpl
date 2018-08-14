@@ -44,7 +44,32 @@
 </table>
 
 <div>
-  <a class="button" href="">
+  <a class="button crm-extensions-refresh" id="new" onClick="update(this);">
     <div class="icon inform-icon"></div>{ts}Refresh{/ts}
   </a>
 </div>
+
+{literal}
+<script type="text/javascript">
+  // UPDATE BUTTONS
+  function update(button) {
+    cj('.button').addClass('disabled');
+
+    var call = CRM.api3('EnketoForm', 'sync', {
+      "magicword": "sesame"
+    });
+
+    call.done(function(result) {
+      cj('.button').removeClass('disabled');
+      location.reload(); 
+    });
+
+    call.fail(
+      function(result) {
+        CRM.alert("{/literal}{ts}The update timed out, but maybe it was partially succesful. You might want to try again.{/ts}", "{ts}Update Problem{/ts}{literal}", "error");
+        cj('.button').removeClass('disabled');
+      });
+  }
+</script>
+{/literal}
+
