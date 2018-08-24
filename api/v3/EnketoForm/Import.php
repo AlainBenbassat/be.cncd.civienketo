@@ -45,8 +45,7 @@ function civicrm_api3_enketo_form_Import($params) {
   
 
   // --- Plugins parameters ---
-  $manager = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_manager');
-  if (!isset($manager) || $manager==0 ) $manager = 1;
+  $manager_group = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_managers');  // If null don't send notifications
     
   $campaign = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_campaign');
 
@@ -63,7 +62,8 @@ function civicrm_api3_enketo_form_Import($params) {
 
   // Notify manager by email
   $logs_summary = $importer->getSummary();
-  send_mail2contact($manager, "[CiviEnketo] Résultat d'importation",
+  send_mail2group($manager_group, "admcrm@cncd.be", 
+    "[CiviEnketo] Résultat d'importation",
     "<h1>Rapport d'importation des mandats</h1>".
     "<h2>".ts('Summary')."</h2>".
     $logs_summary.
@@ -75,12 +75,14 @@ function civicrm_api3_enketo_form_Import($params) {
       'sequential' => 1,
       'form_id' => $form_id,
   ]);
-  $form_id= $result['id'];
+  $id= $result['id'];
   
   $result = civicrm_api3('EnketoForm', 'create', [
       'last_importation_time' => date("Y-m-d H:i:s"),
-      'id' => $form_id,
+      'id' => $id,
   ]);
 
-  return $returnValues = array();
+  $returnValues = array("Form n.$form_id are imported succefuly."); // OK, success
+
+  return civicrm_api3_create_success($returnValues, $params, 'NewEntity', 'NewAction');
 }

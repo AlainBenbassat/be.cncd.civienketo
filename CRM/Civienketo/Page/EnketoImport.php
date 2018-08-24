@@ -7,12 +7,8 @@ class CRM_Civienketo_Page_EnketoImport extends CRM_Core_Page {
     CRM_Utils_System::setTitle(E::ts('Import form records'));
 
     // --- Parameters ---
-    $verbose = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_ver
-bose');
-    if (!isset($verbose)) $verbose = true;
-
     $managers_group = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_managers');
-    if (!isset($managers_group) || $managers_group==0) $managers_group = 1;
+    if ((!isset($managers_group) || $managers_group==0)) $managers_group = 1;
     
     $campaign = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_campaign');
 

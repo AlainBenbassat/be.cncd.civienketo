@@ -53,7 +53,10 @@ class CRM_Civienketo_Importer_CNCD {
       $mandate["contact/lastname"]= ucfirst($mandate["contact/lastname"]);
       $mandate["contact/firstname"]= ucfirst($mandate["contact/firstname"]);
       $contact= $mandate["contact/lastname"].", ".$mandate["contact/firstname"];
-      $iban= $mandate['mandate0/iban_country'].$mandate['mandate_num/iban_checksum'].' ... '.substr($mandate['mandate_num/iban_account'],-4);
+      if (isset($mandate['coord/iban_country'])) 
+        $iban= $mandate['coord/iban_country'].$mandate['mandate_num/iban_checksum'].' ... '.substr($mandate['mandate_num/iban_account'],-4);
+      else 
+        $iban= $mandate['mandate0/iban_country'].$mandate['mandate_num/iban_checksum'].' ... '.substr($mandate['mandate_num/iban_account'],-4);
       $this->logs[] = ' - '.$this->nb_lines.' - <b>'.$contact.'</b> : '.$iban;
 
       $this->create_donor_or_mandate($mandate);
@@ -73,7 +76,10 @@ class CRM_Civienketo_Importer_CNCD {
     try {
 
       // Verify iban
-      $iban= $mandate['mandate0/iban_country'].$mandate['mandate_num/iban_checksum'].$mandate['mandate_num/iban_account'];
+      if (isset($mandate['coord/iban_country']))
+        $iban= $mandate['coord/iban_country'].$mandate['mandate_num/iban_checksum'].$mandate['mandate_num/iban_account'];
+      else
+        $iban= $mandate['mandate0/iban_country'].$mandate['mandate_num/iban_checksum'].$mandate['mandate_num/iban_account'];
       $donor_id = get_account_contact($iban);
       if ($donor_id != 0) {
         $contact_info = get_contact($donor_id);
