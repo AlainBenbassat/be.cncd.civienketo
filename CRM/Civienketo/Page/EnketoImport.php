@@ -19,7 +19,7 @@ class CRM_Civienketo_Page_EnketoImport extends CRM_Core_Page {
     } else {
       $form_id = $_REQUEST['form_id'];
     }
-    if (!isset($_REQUEST['delay'])) {
+    if (isset($_REQUEST['delay'])) {
       $delay = $_REQUEST['delay'];
     } 
     else
