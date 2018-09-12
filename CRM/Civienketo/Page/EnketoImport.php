@@ -19,6 +19,11 @@ class CRM_Civienketo_Page_EnketoImport extends CRM_Core_Page {
     } else {
       $form_id = $_REQUEST['form_id'];
     }
+    if (!isset($_REQUEST['delay'])) {
+      $delay = $_REQUEST['delay'];
+    } 
+    else
+      $delay = 1;
 
     // Test if this form exist in CiviEnketo
     $result = civicrm_api3('EnketoForm', 'getcount', [
@@ -32,7 +37,7 @@ class CRM_Civienketo_Page_EnketoImport extends CRM_Core_Page {
     
     // Download file 
     $downloader = new CRM_Civienketo_Downloader_KPI();
-    $records = $downloader->run($form_id,1);
+    $records = $downloader->run($form_id,$delay);
     $logs_download = $downloader->getLog();
 
     // Import file 
