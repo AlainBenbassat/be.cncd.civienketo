@@ -57,7 +57,7 @@ class CRM_Civienketo_Importer_CNCD {
         $iban= $mandate['coord/iban_country'].$mandate['mandate_num/iban_checksum'].' ... '.substr($mandate['mandate_num/iban_account'],-4);
       else 
         $iban= $mandate['mandate0/iban_country'].$mandate['mandate_num/iban_checksum'].' ... '.substr($mandate['mandate_num/iban_account'],-4);
-      $this->logs[] = ' - '.$this->nb_lines.' - <b>'.$contact.'</b> : '.$iban;
+      $this->logs[] = ' - '.$this->nb_lines.' - <b>'.$contact.'</b> de '.$mandate['coord/city']. ' - '.$iban;
 
       $this->create_donor_or_mandate($mandate);
     }
@@ -119,7 +119,7 @@ class CRM_Civienketo_Importer_CNCD {
       if ((!isset($mandate['mandate_num/iban_account'])) || 
           (!isset($mandate['mandate_num/iban_checksum']))) {
         $this->nb_errors++; 
-        $this->logs("<font color=orange>WARNING : IBAN incorrect</font>");
+        $this->logs[] = "<font color=orange>WARNING : IBAN incorrect</font>";
         ksort($mandate);
         $mandate["warning"] = 'IBAN incorrect';
         $mandates_errors[$this->nb_errors]= $mandate;
