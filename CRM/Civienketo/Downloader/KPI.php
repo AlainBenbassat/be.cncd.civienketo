@@ -56,7 +56,8 @@ class CRM_Civienketo_Downloader_KPI {
     $this->logs[] = ts('- Downloading form n.').' '.$form_id.'... ';
 
     $data = file_get_contents($this->server_url.$api.$form_id.$query, false, $context);
-    $size = file_put_contents($filename, $data);
+    $size = strlen($data);
+    file_put_contents($filename, $data);
     if ($size <= 2) { 
       CRM_Core_Session::setStatus(ts('Downladed file is empty.'), ts('Import warning'), 'warn');
     }
