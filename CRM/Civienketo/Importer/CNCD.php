@@ -40,11 +40,14 @@ class CRM_Civienketo_Importer_CNCD {
 
     $this->manager = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_manager');
     if (!isset($this->manager) || $this->manager==0 ) $this->manager = 1;
+
+    $this->campaign = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_campaign');
+    if (!isset($this->campaign) || $this->campaign==0 ) $this->campaign = null;
   }
 
   function run() {
     $this->timestamp_start= date('d-m-Y H:i:s');
-
+    
     $mandates = $this->mandates;
     foreach ($mandates as $mandate) {
       $this->nb_lines++;
@@ -85,7 +88,7 @@ class CRM_Civienketo_Importer_CNCD {
         $contact_info = get_contact($donor_id);
         if ($contact_info != 0) $nb_duplicate_IBAN++;
       }
- 
+
       // In our case, always create a new donor, even it's a duplicate
       $contact_id = create_donor(
           $mandate['contact/firstname'], $mandate['contact/lastname'] ,
@@ -138,12 +141,17 @@ class CRM_Civienketo_Importer_CNCD {
           $iban, $amount,
           $mandate["mandate/collect_day"], $mandate["end"], 
           'FRST', $mandate["username"], 
-          null, $mandate["mandate/first_collect"], $campaign);
+          null, $mandate["mandate/first_collect"], $this->campaign);
         $this->nb_new_mandate++; 
+        $this->logs[] = "  Mandat de <font color=gold>$amount €</font> tous les ".$mandate["mandate/collect_day"]." de chaque mois.</font> fait à ".$mandate["info/location"];
         $mandate_created = true;
       }
 
-      // Add in Donators groups
+      // Add in donors groups
+      add_contact2group($contact_id, 1058);  // Mandats à vérifier
+      if (isset($mandate['info/volunteer']) && $mandate['info/volunteer'] == 1) {
+        add_contact2group($contact_id, 333);  // Groupe appel à volontaire
+      }
       if ($mandate_created) {
         $group_parent = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_group_parent');
         add_contact2group($contact_id, $group_parent); 
