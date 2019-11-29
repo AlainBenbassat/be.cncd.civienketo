@@ -6,9 +6,9 @@
 | http://www.cncd.be/                                    |
 +--------------------------------------------------------*/
 
-require_once 'CRM/Civienketo/Importer/lib/contact.php';
-require_once 'CRM/Civienketo/Importer/lib/mandate.php';
-require_once 'CRM/Civienketo/Importer/lib/bank_account.php';
+require_once 'CRM/Civienketo/Importer/contact.php';
+require_once 'CRM/Civienketo/Importer/mandate.php';
+require_once 'CRM/Civienketo/Importer/bank_account.php';
 
 class CRM_Civienketo_Importer_CNCD {
 
@@ -55,11 +55,19 @@ class CRM_Civienketo_Importer_CNCD {
       // Normalize data 
       $mandate["contact/lastname"]= ucfirst($mandate["contact/lastname"]);
       $mandate["contact/firstname"]= ucfirst($mandate["contact/firstname"]);
+      $mandate["contact/city"]= ucfirst($mandate["contact/city"]);
       $contact= $mandate["contact/lastname"].", ".$mandate["contact/firstname"];
       if (isset($mandate['coord/iban_country'])) 
         $iban= $mandate['coord/iban_country'].$mandate['mandate_num/iban_checksum'].' ... '.substr($mandate['mandate_num/iban_account'],-4);
-      else 
-        $iban= $mandate['mandate0/iban_country'].$mandate['mandate_num/iban_checksum'].' ... '.substr($mandate['mandate_num/iban_account'],-4);
+      else {
+        if (isset($mandate['mandate0/iban_country'])) 
+          $iban= $mandate['mandate0/iban_country'].$mandate['mandate_num/iban_checksum'].' ... '.substr($mandate['mandate_num/iban_account'],-4);
+        else 
+          if ($mandate['mandate0/bank_country']!='other')
+            $iban= $mandate['mandate0/bank_country'].$mandate['mandate_num/iban_checksum'].' ... '.substr($mandate['mandate_num/iban_account'],-4);
+          else
+            $iban= substr($mandate['mandate_num_NC/iban_account_nc'],8);
+      }
       $this->logs[] = ' - '.$this->nb_lines.' - <b>'.$contact.'</b> de '.$mandate['coord/city']. ' - '.$iban;
 
       $this->create_donor_or_mandate($mandate);
@@ -81,8 +89,15 @@ class CRM_Civienketo_Importer_CNCD {
       // Verify iban
       if (isset($mandate['coord/iban_country']))
         $iban= $mandate['coord/iban_country'].$mandate['mandate_num/iban_checksum'].$mandate['mandate_num/iban_account'];
-      else
-        $iban= $mandate['mandate0/iban_country'].$mandate['mandate_num/iban_checksum'].$mandate['mandate_num/iban_account'];
+      else {
+        if (isset($mandate['mandate0/iban_country']))
+          $iban= $mandate['mandate0/iban_country'].$mandate['mandate_num/iban_checksum'].$mandate['mandate_num/iban_account'];
+        else
+          if ($mandate['mandate0/bank_country']!="other")
+            $iban= $mandate['mandate0/bank_country'].$mandate['mandate_num/iban_checksum'].$mandate['mandate_num/iban_account'];
+          else
+            $iban= $mandate['mandate_num_NC/iban_account_nc'];
+      }
       $donor_id = get_account_contact($iban);
       if ($donor_id != 0) {
         $contact_info = get_contact($donor_id);
@@ -92,8 +107,10 @@ class CRM_Civienketo_Importer_CNCD {
       // In our case, always create a new donor, even it's a duplicate
       $contact_id = create_donor(
           $mandate['contact/firstname'], $mandate['contact/lastname'] ,
-          $mandate['contact/langage'], null,
-          $mandate['contact/birthdate'], 'KTB-'.$mandate['_uuid'], "tablet-".$mandate['imei'].'-'.$mandate['username'], $mandate['info/channel']); 
+          $mandate['contact/langage'], $mandate['contact/civility'],
+          $mandate['contact/birthdate'], 'KTB-'.$mandate['_uuid'], // must be unique 
+          "tablet-".$mandate['imei'].'-'.$mandate['username'].'-'.$mandate['info/location'], $mandate['info/channel'],
+          $mandate['info/no_phone'], $mandate['info/no_mail'], $mandate['info/no_email'], $mandate['info/no_mailing']); 
       $this->nb_new_contact++;
       $contact_created = true;
 
@@ -143,14 +160,14 @@ class CRM_Civienketo_Importer_CNCD {
           'FRST', $mandate["username"], 
           null, $mandate["mandate/first_collect"], $this->campaign);
         $this->nb_new_mandate++; 
-        $this->logs[] = "  Mandat de <font color=gold>$amount €</font> tous les ".$mandate["mandate/collect_day"]." de chaque mois.</font> fait à ".$mandate["info/location"];
+        $this->logs[] = "  Mandat de <font color=gold>$amount €</font> tous les ".$mandate["mandate/collect_day"]." de chaque mois. Fait à ".$mandate["info/location"];
         $mandate_created = true;
       }
 
       // Add in donors groups
-      add_contact2group($contact_id, 1058);  // Mandats à vérifier
+      add_contact2group($contact_id, 1062);  // Mandats à vérifier
       if (isset($mandate['info/volunteer']) && $mandate['info/volunteer'] == 1) {
-        add_contact2group($contact_id, 333);  // Groupe appel à volontaire
+        add_contact2group($contact_id, 330);  // Récolte pour l'opération
       }
       if ($mandate_created) {
         $group_parent = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_group_parent');
@@ -160,6 +177,7 @@ class CRM_Civienketo_Importer_CNCD {
             case 'mail' :
               $group_email = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_group_email');
               add_contact2group($contact_id, $group_email); 
+              add_contact2group($contact_id, 42); // Newsletter
               break;
             case 'postal' :
               $group_postal = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_group_postal');
@@ -178,6 +196,7 @@ class CRM_Civienketo_Importer_CNCD {
       if ($contact_created) $this->nb_new_contact--;
       if ($mandate_created) $this->nb_new_mandate--;
       $this->logs[] = "<font color=red>ERROR : $errorMessage</font><br>Do rollback.";
+      $this->logs[] = $e->getTrace();
       $tx->rollback();
     }
   }

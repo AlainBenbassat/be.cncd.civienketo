@@ -47,7 +47,8 @@ function create_mandate($contact_id, $iban, $amount, $day, $signdate, $status='F
 
   /* --- Create mandate --- */
   // Find BIC
-  if (substr($iban,0, 2) == 'BE') {
+  $supported_country = array('BE', 'DE', 'LU', 'NL');
+  if (in_array(substr($iban,0, 2), $supported_country)) {
     $result = civicrm_api3('Bic', 'getfromiban', array(
         'iban' => $iban,
       ));

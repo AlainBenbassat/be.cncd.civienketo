@@ -66,7 +66,7 @@ function check_duplicate_donor($iban) {
 /*** 
   Create a new donor 
 */
-function create_donor($firstname, $lastname, $language, $gender, $birthdate, $external_id=NULL, $source=NULL, $preferred_com=NULL) {
+function create_donor($firstname, $lastname, $language, $civility, $birthdate, $external_id=NULL, $source=NULL, $preferred_com=NULL, $no_phone=NULL, $no_mail=NULL, $no_email=NULL, $no_mailing=NULL) {
 
   if (!isset($source)) $source = "Script ".__FILE__;
 
@@ -84,14 +84,20 @@ function create_donor($firstname, $lastname, $language, $gender, $birthdate, $ex
       $language= 'en_GB';
       break;
   }
-  switch ($gender) {
+  switch ($civility) {
+    case 'Mme': 
+    case 'Madame': 
     case 'F': 
     case 'Féminin': 
       $gender= 'Female';
+      $prefix= 'Mrs.';
       break;
+    case 'M.': 
+    case 'Monsieur': 
     case 'M': 
     case 'Masculin': 
       $gender= 'Male';
+      $prefix= 'Mr.';
       break;
   }
   if (isset($birthdate) && $birthdate!=NULL) { 
@@ -127,9 +133,14 @@ function create_donor($firstname, $lastname, $language, $gender, $birthdate, $ex
     'contact_sub_type' => 'Donateur',
     'preferred_language' => $language,
     'gender_id' => $gender,
+    'prefix_id' => $prefix,
     'birth_date' => $birth_date,
     'source' => $source,
     'do_not_trade' => 1,
+    'do_not_phone' => $no_phone,
+    'do_not_mail' => $no_mail,
+    'do_not_email' => $no_email,
+    'is_opt_out' => $no_mailing,
     'external_identifier' => $external_id,
     'preferred_communication_method' => $preferred_com,
   );
