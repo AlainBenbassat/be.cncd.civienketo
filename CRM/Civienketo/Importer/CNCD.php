@@ -6,9 +6,10 @@
 | http://www.cncd.be/                                    |
 +--------------------------------------------------------*/
 
-require_once 'CRM/Civienketo/Importer/contact.php';
-require_once 'CRM/Civienketo/Importer/mandate.php';
-require_once 'CRM/Civienketo/Importer/bank_account.php';
+require_once 'CRM/Civienketo/lib/contact.php';
+require_once 'CRM/Civienketo/lib/newsletter.php';
+require_once 'CRM/Civienketo/lib/mandate.php';
+require_once 'CRM/Civienketo/lib/bank_account.php';
 
 class CRM_Civienketo_Importer_CNCD {
 
@@ -134,7 +135,10 @@ class CRM_Civienketo_Importer_CNCD {
             "<p>".$mandate['username']." a écrit la note suivante : '".$mandate['info/remarks']."' dans la fiche de ce <a href='https://crm.cncd.be/civicrm/contact/view?reset=1&cid=".$contact_id."'>contact</a>.</p>".
              "<p>Merci de prendre les dispositions adéquates.<br>Civibot</p>");
       }
-      
+      if (isset($mandate['merci/photo']) && $mandate['merci/photo'] != "") {
+/*        $photo= $user."%2Fattachments%2F".$formhub."%2F".$uuid."%2F".$mandate['merci/photo'];
+        add_enketo_image_profil($contact_id, $photo);*/
+      }      
       // If IBAN is specified, create the mandate 
       if ((!isset($mandate['mandate_num/iban_account'])) || 
           (!isset($mandate['mandate_num/iban_checksum']))) {
@@ -151,14 +155,19 @@ class CRM_Civienketo_Importer_CNCD {
           $amount = $mandate["mandate/amount"];
         } else {
           $amount = $mandate["mandate/amount_other"];
-        }
+	}
+
+        if ($mandate['sign/sign_date']!=NULL)
+          $sign_date=$mandate['sign/sign_date'];
+        else
+          $sign_date=$mandate['end'];
 
         $mandate_id = create_mandate(
           $contact_id, 
           $iban, $amount,
-          $mandate["mandate/collect_day"], $mandate["end"], 
+          $mandate["mandate/collect_day"], $sign_date, 
           'FRST', $mandate["username"], 
-          null, $mandate["mandate/first_collect"], $this->campaign);
+          null, $mandate["mandate/first_collect"], $this->campaign, $mandate["mandate_num/bic"], $mandate["end"]);
         $this->nb_new_mandate++; 
         $this->logs[] = "  Mandat de <font color=gold>$amount €</font> tous les ".$mandate["mandate/collect_day"]." de chaque mois. Fait à ".$mandate["info/location"];
         $mandate_created = true;
@@ -166,9 +175,18 @@ class CRM_Civienketo_Importer_CNCD {
 
       // Add in donors groups
       add_contact2group($contact_id, 1062);  // Mandats à vérifier
-      if (isset($mandate['info/volunteer']) && $mandate['info/volunteer'] == 1) {
+      if (isset($mandate['info/newsletter']) && $mandate['info/newsletter'] == 'OK') {
+        subscribe_to_newsletter($contact_id);  
+      }	
+      if (isset($mandate['info/volunteer']) && $mandate['info/volunteer'] == 1) { // Avant la V3
         add_contact2group($contact_id, 330);  // Récolte pour l'opération
       }
+      if (isset($mandate['info/volunteer']) && $mandate['info/volunteer'] == 'OK') {
+        add_contact2group($contact_id, 330);  // Récolte pour l'opération
+      }
+      if (isset($mandate['info/mobilisation']) && $mandate['info/mobilisation'] == 'OK') {
+        subscribe_to_regional_newsletter($contact_id, $mandate['coord/country'], $mandate['coord/postalcode']);  
+      }	      
       if ($mandate_created) {
         $group_parent = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_group_parent');
         add_contact2group($contact_id, $group_parent); 
@@ -177,7 +195,7 @@ class CRM_Civienketo_Importer_CNCD {
             case 'mail' :
               $group_email = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_group_email');
               add_contact2group($contact_id, $group_email); 
-              add_contact2group($contact_id, 42); // Newsletter
+              subscribe_to_newsletter($contact_id);  // Pour rester retro-compatible avec la version <= 2 
               break;
             case 'postal' :
               $group_postal = CRM_Core_BAO_Setting::getItem('CiviEnketo Preferences', 'enketo_group_postal');
@@ -217,12 +235,19 @@ class CRM_Civienketo_Importer_CNCD {
     $summary.= "<p>".ts("Start Date")." : ".$this->timestamp_start."</p>";
     $summary.= "$this->nb_lines fiches reçues : <br>";
     $summary.= "- $this->nb_new_contact contacts crées.<br>";
-    $summary.= "- $this->count_notes notes créées.<br>";
     $summary.= "- $this->nb_new_mandate mandats créés. <br>";
     $summary.= "- $this->nb_duplicate_IBAN IBAN en double. <br>";
+    $summary.= "- $this->count_notes notes créées.<br>";
     $summary.= "Nombre d'erreurs rencontrées et annulées : $this->nb_errors.<br>";
     $summary.= "<p>".ts("End Date")." : ".$this->timestamp_end."</p>";
 
     return $summary;
+  }
+
+  /**
+   * Get number of records
+   */
+  function getNb_lines() {
+    return $this->nb_lines;
   }
 }

@@ -85,16 +85,16 @@ function create_donor($firstname, $lastname, $language, $civility, $birthdate, $
       break;
   }
   switch ($civility) {
-    case 'Mme': 
     case 'Madame': 
+    case 'Mme': 
     case 'F': 
     case 'Féminin': 
       $gender= 'Female';
       $prefix= 'Mrs.';
       break;
-    case 'M.': 
-    case 'Monsieur': 
     case 'M': 
+    case 'Monsieur': 
+    case 'M.': 
     case 'Masculin': 
       $gender= 'Male';
       $prefix= 'Mr.';
@@ -238,32 +238,34 @@ function add_home_address($uid, $street, $postalcode, $city, $country) {
       break;
       throw new Exception('Unknow country.');   
   }
-  if ($postalcode < 1299) {
-     $province_id = 5217;		// 'Bruxelles';
-  } else if ($postalcode < 1499) {
-     $province_id = 1786;		// 'Brabant Wallon';
-  } else if ($postalcode < 1999) {
-     $province_id = 1793;		// 'Vlaams-Brabant';
-  } else if ($postalcode < 2999) {
-     $province_id = 1785;		// 'Antwerpen';
-  } else if ($postalcode < 3499) {
-     $province_id = 1793;		// 'Vlaams-Brabant';
-  } else if ($postalcode < 3999) {
-     $province_id = 1789;		// 'Limbourg';
-  } else if ($postalcode < 4999) {
-     $province_id = 1788;		// 'Liège';
-  } else if ($postalcode < 5999) {
-     $province_id = 1791;		// 'Namur';
-  } else if ($postalcode < 6599) {
-     $province_id = 1787;		// 'Hainaut';
-  } else if ($postalcode < 6999) {
-     $province_id = 1790;		// 'Luxembourg';	
-  } else if ($postalcode < 7999) {
-     $province_id = 1789;		// 'Hainaut';
-  } else if ($postalcode < 8999) {
-     $province_id = 1794;		// 'West-Vlaanderen';
-  } else if ($postalcode < 9999) {
-     $province_id = 1792;		// Oost-Vlanderen
+  if ($country_id == 1020) {
+    if ($postalcode < 1299) {
+      $province_id = 5217;		// 'Bruxelles';
+    } else if ($postalcode < 1499) {
+      $province_id = 1786;		// 'Brabant Wallon';
+    } else if ($postalcode < 1999) {
+      $province_id = 1793;		// 'Vlaams-Brabant';
+    } else if ($postalcode < 2999) {
+      $province_id = 1785;		// 'Antwerpen';
+    } else if ($postalcode < 3499) {
+      $province_id = 1793;		// 'Vlaams-Brabant';
+    } else if ($postalcode < 3999) {
+      $province_id = 1789;		// 'Limbourg';
+    } else if ($postalcode < 4999) {
+      $province_id = 1788;		// 'Liège';
+    } else if ($postalcode < 5999) {
+      $province_id = 1791;		// 'Namur';
+    } else if ($postalcode < 6599) {
+      $province_id = 1787;		// 'Hainaut';
+    } else if ($postalcode < 6999) {
+      $province_id = 1790;		// 'Luxembourg';	
+    } else if ($postalcode < 7999) {
+      $province_id = 1789;		// 'Hainaut';
+    } else if ($postalcode < 8999) {
+      $province_id = 1794;		// 'West-Vlaanderen';
+    } else if ($postalcode < 9999) {
+      $province_id = 1792;		// Oost-Vlanderen
+    }
   }
 
   $result = civicrm_api3('Address', 'create', array(
@@ -317,6 +319,9 @@ function add_home_phone($uid, $phone, $phone_type="Phone") {
   Send a email to a contact
 */
 function send_mail2contact($contact_id, $subject, $message, $file=null, $sender='donateurs@cncd.be') {
+  $retval = send_mail_alternate_method($contact_id, $subject, $message, $file, $sender);
+  return $retval;
+   /*
   require_once('libphp-phpmailer/class.phpmailer.php');
 
   $email = new PHPMailer();
@@ -342,6 +347,38 @@ function send_mail2contact($contact_id, $subject, $message, $file=null, $sender=
   if ($file) $email->addAttachment($file);
   
   return $email->send();
+  */
+}
+
+function send_mail_alternate_method($contact_id, $subject, $message, $file=null, $sender='donateurs@cncd.be') {
+  // Recipients
+  $result = civicrm_api3('Contact', 'get', array(
+    'sequential' => 1,
+    'id' => $contact_id,
+  ));
+  if ((!isset($result['count']) || $result['count'] != 1)) {
+     return -1;
+  }
+  $contact= $result['values'][0];
+  if ((!isset($contact['email']) || $contact['email'] == '')) {
+    return -2;
+  }
+  $to = $contact['email'];
+
+  $mailParams = array(
+  'groupName' => 'Activity Email Sender',
+  'from' => $sender,
+  'toName' => $to,
+  'toEmail' => $to,
+  'subject' => $subject,
+  'text' => strip_tags($message),
+  'html' => $message,
+  );
+
+  /* TODO attachments */
+
+  CRM_Utils_Mail::send($mailParams);
+  return 0;
 }
 
 function create_donor_note($uid, $subject, $text) {
@@ -368,7 +405,7 @@ function send_mail2group($group_id, $from, $subject, $message) {
       'group_id' => $group_id,
   ));
   if (!isset($result['count']) || $result['count'] == 0) return 0;
-  if ($result['count'] > 3) return -1; // Anti massive leak precaution
+  if ($result['count'] > 5) return -1; // Anti massive leak precaution
 
   $count = 0;
   foreach($result['values'] as $contact) {
@@ -394,4 +431,24 @@ function send_mail2group($group_id, $from, $subject, $message) {
 
   return $count;
 }
+
+function add_enketo_image_profil($cid, $photo, $dir=NULL) {
+
+  if ($dir == NULL)
+    $dir = CRM_Core_Config::singleton()->uploadDir;
+  $url = $dir.$photo;
+
+/*  // Download photo
+  $website = "https://kc.humanitarianresponse.info";
+  $query = "/media/original?media_file=";
+  $size = file_put_contents($url, file_get_contents($website.$query.$photo, false, $context));
+*/
+
+  $result = civicrm_api3('Contact', 'create', [
+      'id' => $cid,
+      'image_URL' => $url,
+    ]); 
+}
+
+
 ?>

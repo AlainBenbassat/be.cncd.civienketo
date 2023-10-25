@@ -63,7 +63,7 @@ function civicrm_api3_enketo_form_Import($params) {
   // Notify manager by email
   $logs_summary = $importer->getSummary();
   send_mail2group($manager_group, "admcrm@cncd.be", 
-    "[CiviEnketo] Résultat d'importation ($form_id)",
+    "[CiviEnketo] Résultat d'importation ($form_id) : ".$importer->getNb_lines()." fiches",
     "<h1>Rapport d'importation des mandats</h1>".
     "<h2>".ts('Summary')."</h2>".
     $logs_summary.

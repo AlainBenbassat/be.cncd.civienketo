@@ -6,7 +6,7 @@
 /*
   Create a mandate for the contact
 */
-function create_mandate($contact_id, $iban, $amount, $day, $signdate, $status='FRST', $source=NULL, $ref=NULL, $startdate=NULL, $campaign=NULL) {
+function create_mandate($contact_id, $iban, $amount, $day, $signdate, $status='FRST', $source=NULL, $ref=NULL, $startdate=NULL, $campaign=NULL, $bic=NULL, $validation_date=NULL) {
 
   if ($amount==NULL || $amount==0 || $amount[0]=='€')
       throw new Exception('Amount of mandate is null.');
@@ -73,6 +73,7 @@ function create_mandate($contact_id, $iban, $amount, $day, $signdate, $status='F
     "cycle_day" => $day,
     "date" => $signdate,
     "start_date" => $startdate,
+    "validation_date" => $validation_date,
     "frequency_interval" => 1,
     "frequency_unit" => 'month',
     "campaign_id" => $campaign,
